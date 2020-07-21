@@ -1,0 +1,23 @@
+---
+title: "README"
+author: "Tao Sun"
+date: "`r Sys.Date()`"
+output: rmarkdown::github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction - ST558 Project 3
+
+Project 3 is to create a R Shiny App. `pitches` dataset from `pitchRx` package is used for the project, the dataset introduction and example R Shiny App are [here](https://pitchrx.cpsievert.me/).
+
+## App design and introduction
+
+  1. Information page - describes the data and abilities of the app.  
+  2. Data exploration page - numeric and graphical summaries.
+  3. Clustering analysis - dendogram.
+  4. Modeling - > two supervised learning model and options for prediction.
+  5. Data / subset of data interest.
+  

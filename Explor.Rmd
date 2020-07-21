@@ -1,0 +1,41 @@
+---
+title: "pitcher"
+author: "Tao Sun"
+date: "7/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(shiny)
+library(pitchRx)
+library(shinydashboard)
+library(plotly)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(plyr)
+library(DT)
+```
+
+# Data exploration
+```{r}
+data <- pitches %>% select(-c(url, sv_id))
+
+summary(data)
+
+
+```
+
+run shiny Demo by pitchRx
+
+```{r}
+runGitHub('pitchRx', 'cpsievert', 
+          subdir='inst/shiny')
+```
+```{r}
+library(shiny)
+shiny::runGitHub('shiny_apps', 'cpsievert', subdir='pitchRx')
+```
+
+
