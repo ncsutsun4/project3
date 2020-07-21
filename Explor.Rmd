@@ -20,10 +20,6 @@ library(DT)
 
 # Data exploration
 ```{r}
-data <- pitches %>% select(-c(url, sv_id))
-
-summary(data)
-
 
 ```
 
@@ -37,5 +33,97 @@ runGitHub('pitchRx', 'cpsievert',
 library(shiny)
 shiny::runGitHub('shiny_apps', 'cpsievert', subdir='pitchRx')
 ```
+
+
+
+
+
+```{r}
+# Download data set 
+if(!exists("mondayBaseball")) {
+    load(url("http://stat.duke.edu/courses/Summer17/sta101.001-2/uploads/project/mondayBaseball.Rdata"))
+}
+
+# Subset new data set with only pitches hit in play and remove some unrelated varables
+InPlay <- mondayBaseball %>% filter(pitchResult == "IP") %>% 
+    select(-c(gameString, gameDate, batterId, batterName, batterPosition, timesFaced,
+              catcher, umpireId, umpire))
+
+# balls : # of balls thrown before that thrown
+# strikes : # of strickes batter obtained
+# outs  :  players been declared out
+# 
+
+# Check Battered Ball Distance
+sideLabs <- c("Top Inning", "Bottom Inning")
+names(sideLabs) <- c("T", "B")
+
+ggplot(data = InPlay, aes(x = battedBallDistance)) +
+    geom_histogram(fill = "skyblue", color = "black", bins=30) +
+    xlab("Distance From Home Plate") + # Axis labels
+    ylab("Count") +
+    ggtitle("Distribution of Batted Ball Distance") + # Creates the title
+    theme(plot.title = element_text(hjust = 0.5)) + # Centers the title
+    facet_wrap(~side, labeller=labeller(side=sideLabs))
+
+
+
+
+ggplot(data = InPlay, aes(x=pitchType)) + geom_bar(stat="count")
+modelData <- InPlay %>% mutate(FF_Type = ifelse(pitchType == "FF", 1, 0))
+
+# pitch Velocity by pitch Type
+
+breakingballs <- c("CU","KC","SC","SL")
+changeups <- c("CH","KN","EP")
+fastballs <- c("FC","FF","FS","FT","SI")
+
+
+
+velData <- InPlay %>%  select(pitchType, releaseVelocity) %>%
+     filter(pitchType %in% fastballs)
+
+
+unique(velData$pitchType)
+
+ggplot(velData, aes(x = releaseVelocity, fill = pitchType)) +
+  geom_histogram(binwidth = 1, color = "grey30") +
+  facet_grid(~ pitchType) +
+  xlim(60,105) +
+  ylab("Frequency") +
+  xlab("Pitch Speed (mph)") +
+  ggtitle("Pitch Velocity by Pitch Type") +
+ # scale_fill_discrete(name = "Pitch Type", labels = c("Breaking Balls", "Changeups", "Fastballs")) +
+  theme(panel.grid.minor = element_blank(),
+        axis.ticks = element_blank())
+
+
+# Breaking Balls - off-speed (less speed than fastball) pitch that has downward or sideways motion (sometimes both) as it approaches the batter Pitches included: curveball (CU), knuckle curve (KC), screwball (SC), slider (SL)
+# Changeups - off-speed (less speed than fastball) pitch that is meant to look like a fastball but approach batter more slowly to confuse the batter’s timing Pitches included: changeup (CH), knuckleball (KN), eephus (EP)
+# Fastballs - standard pitch thrown at top speeds capable by pitcher’s Pitches included: cutter (FC), four-seam fastball (FF), splitter (FS), two-seam fastball (FT), sinker (SI)
+# Other - pitches that don’t fit the other categories and/or make up less than 0.1% of pitches Pitches included: pitchout (FO/PO), intentional ball (IN), unknown (UN), unidentified (AB & FA)
+# 
+
+
+# logistic model
+
+logi <- glm(FF_Type ~ releaseVelocity + spinRate + spinDir, family="binomial", data=modelData)
+
+
+
+# clustering
+
+clusterData <- InPlay %>% dplyr::select_if(is.numeric)
+
+hierClust <- hclust(dist(clusterData), method ="complete")
+plot(hierClust, xlab = "", title ="Cluster Dendrogram")
+
+method<- c("complete", "average", "centroid")
+
+# PCA
+
+  
+```
+
 
 
