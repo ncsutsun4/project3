@@ -6,7 +6,7 @@ library(shiny)
 ui <- bootstrapPage(
     navbarPage(theme = shinytheme("flatly"), collapsible = TRUE,
                "PitchRx", id="nav",
-               
+               # 1.
                tabPanel("Information",
                    tags$div(
                        tags$h4("Background"), 
@@ -23,12 +23,11 @@ ui <- bootstrapPage(
                        "Tao Sun",tags$br(),
                        tags$br(),tags$br(),tags$h4("Contact"),
                        "tsun4@ncsu.edu",tags$br(),tags$br(),
-
                    )
                    
                ),
-               
-               tabPanel("Information",
+               # 2. 
+               tabPanel("Data Exploration",
                         
                         sidebarLayout(
                             sidebarPanel(
@@ -77,8 +76,8 @@ ui <- bootstrapPage(
                             )
                         )
                ),
-               
-               tabPanel("Data Exploration",
+               # 3.
+               tabPanel("Clustering Analysis",
                         div(class="outer",
                             tags$head(includeCSS("styles.css")),
                             leafletOutput("sars_map", width="100%", height="100%"),
@@ -113,8 +112,8 @@ ui <- bootstrapPage(
                                                                          "https://twitter.com/intent/tweet?text=%20@LSHTM_Vaccines%20outbreak%20mapper&url=https://bit.ly/2uBvnds&hashtags=coronavirus")))
                         )
                ),
-               
-               tabPanel("Clustering Analysis",
+               # 4. 
+               tabPanel("Data Modeling and Prediction",
                         
                         sidebarLayout(
                             sidebarPanel(
@@ -131,17 +130,13 @@ ui <- bootstrapPage(
                             mainPanel(plotlyOutput("comparison_plot"), width = 6)
                         )
                ),
-               
+               # 5. 
                tabPanel("Data",
                         numericInput("maxrows", "Rows to show", 25),
                         verbatimTextOutput("rawtable"),
                         downloadButton("downloadCsv", "Download as CSV"),tags$br(),tags$br(),
                         "Adapted from timeline data published by ", tags$a(href="https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series", 
                                                                            "Johns Hopkins Center for Systems Science and Engineering.")
-               ),
-               
-               tabPanel("Model and Prediction",
-
                )
                
     )          
