@@ -73,27 +73,24 @@ ggplot(data = InPlay, aes(x=pitchType)) + geom_bar(stat="count")
 modelData <- InPlay %>% mutate(FF_Type = ifelse(pitchType == "FF", 1, 0))
 
 # pitch Velocity by pitch Type
-
 breakingballs <- c("CU","KC","SC","SL")
 changeups <- c("CH","KN","EP")
 fastballs <- c("FC","FF","FS","FT","SI")
 
 
-
-velData <- InPlay %>%  select(pitchType, releaseVelocity) %>%
+plotData <- InPlay %>%  select(pitchType, releaseVelocity) %>%
      filter(pitchType %in% fastballs)
 
 
-unique(velData$pitchType)
+unique(plotData$pitchType)
 
-ggplot(velData, aes(x = releaseVelocity, fill = pitchType)) +
+ggplot(plotData, aes(x = releaseVelocity, fill = pitchType)) +
   geom_histogram(binwidth = 1, color = "grey30") +
   facet_grid(~ pitchType) +
   xlim(60,105) +
   ylab("Frequency") +
   xlab("Pitch Speed (mph)") +
   ggtitle("Pitch Velocity by Pitch Type") +
- # scale_fill_discrete(name = "Pitch Type", labels = c("Breaking Balls", "Changeups", "Fastballs")) +
   theme(panel.grid.minor = element_blank(),
         axis.ticks = element_blank())
 

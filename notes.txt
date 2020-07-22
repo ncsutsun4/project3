@@ -1,0 +1,13 @@
+sideLabs <- c("Top Inning", "Bottom Inning")
+names(sideLabs) <- c("T", "B")
+
+ggplot(data = InPlay, aes(x = battedBallDistance)) +
+    geom_histogram(fill = "skyblue", color = "black", bins=30) +
+    xlab("Distance From Home Plate") + # Axis labels
+    ylab("Count") +
+    ggtitle("Distribution of Batted Ball Distance") + # Creates the title
+    theme(plot.title = element_text(hjust = 0.5)) + # Centers the title
+    facet_wrap(~side, labeller=labeller(side=sideLabs))
+
+Trace type must be one of the following: 
+'scatter', 'bar', 'box', 'heatmap', 'histogram', 'histogram2d', 'histogram2dcontour', 'contour', 'scatterternary', 'violin', 'funnel', 'waterfall', 'image', 'pie', 'sunburst', 'treemap', 'funnelarea', 'scatter3d', 'surface', 'isosurface', 'volume', 'mesh3d', 'cone', 'streamtube', 'scattergeo', 'choropleth', 'scattergl', 'splom', 'pointcloud', 'heatmapgl', 'parcoords', 'parcats', 'scattermapbox', 'choroplethmapbox', 'densitymapbox', 'sankey', 'indicator', 'table', 'carpet', 'scattercarpet', 'contourcarpet', 'ohlc', 'candlestick', 'scatterpolar', 'scatterpolargl', 'barpolar', 'area'
