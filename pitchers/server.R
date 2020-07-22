@@ -18,7 +18,7 @@ if(!exists("mondayBaseball")) {
 # Subset new data set with only pitches hit in play and remove some unrelated varables
 InPlay <- mondayBaseball %>% filter(pitchResult == "IP") %>% 
     select(-c(gameString, gameDate, batterId, batterName, batterPosition, timesFaced,
-              catcher, umpireId, umpire, pitchResult ))
+              catcher, umpireId, umpire)) %>% select_if(~ !any(is.na(.)))
 
 # balls : # of balls thrown before that thrown
 # strikes : # of strickes batter obtained
@@ -122,7 +122,59 @@ shinyServer(function(input, output, session) {
         pcaData <- pcaData()
         pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
         biplot(pcaAnalysis,xlabs = rep(".", nrow(pcaData)), cex = 1.2, choices=c(input$selectPc1, input$selectPc2))
-    }
-    )
+    })
+    
+    # Fit models and predict navbarPage -3
+    
+    
+    mData <- reactive({
+        mData <- InPlay %>%  select(pitchType, releaseVelocity, pitcherHand, batterHand, battedBallDistance) %>% 
+            filter(pitchType == "FF")
+    })
+        
+    
+    output$mplot2 <- renderPlot({
+        ggplot(mData(), aes(x = releaseVelocity, fill = batterHand)) +
+            geom_histogram(binwidth = 1, color = "grey30") +
+            facet_grid(~ pitcherHand) +
+            xlim(60,105) +
+            ylab("Frequency") +
+            xlab("Pitch Speed (mph)") +
+            ggtitle("Pitch Velocity by Pitch Type") +
+            theme(panel.grid.minor = element_blank(),
+                  axis.ticks = element_blank())
+    })
+    
+    # Exporting dataset navbarPage -4
+    exportData <- reactive({
+        exportData <- InPlay 
+        print(head(pcaData))
+        exportData
+    })
+    # Table output
+    output$exportData <- DT::renderDataTable({
+        DT::datatable({
+            exportData()},
+            extensions = 'Buttons',
+            
+            options = list(
+                paging = TRUE,
+                searching = TRUE,
+                fixedColumns = TRUE,
+                autoWidth = TRUE,
+                ordering = TRUE,
+                dom = 'tB',
+                buttons = c('copy', 'csv', 'excel')
+            ),
+            
+            class = "display"
+            
+            )
 
+    })
+    #For download
+    output$export <- downloadHandler(
+        filename = function(){paste("Pitcher data.csv")},
+        content = function(file){write.csv(exportData(), file, row.names = FALSE)}
+    )
 })

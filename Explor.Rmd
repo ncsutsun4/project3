@@ -47,7 +47,7 @@ if(!exists("mondayBaseball")) {
 # Subset new data set with only pitches hit in play and remove some unrelated varables
 InPlay <- mondayBaseball %>% filter(pitchResult == "IP") %>% 
     select(-c(gameString, gameDate, batterId, batterName, batterPosition, timesFaced,
-              catcher, umpireId, umpire))
+              catcher, umpireId, umpire)) %>% select_if(~ !any(is.na(.)))
 
 # balls : # of balls thrown before that thrown
 # strikes : # of strickes batter obtained
@@ -78,15 +78,16 @@ changeups <- c("CH","KN","EP")
 fastballs <- c("FC","FF","FS","FT","SI")
 
 
-plotData <- InPlay %>%  select(pitchType, releaseVelocity) %>%
+plotData <- InPlay %>%  select(pitchType, releaseVelocity, pitcherHand) %>%
      filter(pitchType %in% fastballs)
 
+plotData <- InPlay %>%  select(pitchType, releaseVelocity, pitcherHand, batterHand, battedBallDistance) %>% filter(pitchType == "FF")
 
 unique(plotData$pitchType)
 
-ggplot(plotData, aes(x = releaseVelocity, fill = pitchType)) +
+ggplot(plotData, aes(x = releaseVelocity, fill = batterHand)) +
   geom_histogram(binwidth = 1, color = "grey30") +
-  facet_grid(~ pitchType) +
+  facet_grid(~ pitcherHand) +
   xlim(60,105) +
   ylab("Frequency") +
   xlab("Pitch Speed (mph)") +
@@ -104,8 +105,12 @@ ggplot(plotData, aes(x = releaseVelocity, fill = pitchType)) +
 
 # logistic model
 
-logi <- glm(FF_Type ~ releaseVelocity + spinRate + spinDir, family="binomial", data=modelData)
+logi <- glm(FF_Type ~ releaseVelocity +  locationHoriz + locationVert   , family="binomial", data=modelData)
 
+linear <- lm(battedBallDistance ~ releaseVelocity +  + locationHoriz + locationVert   , data = modelData)
+
+summary(logi)
+summary(linear)
 
 
 # clustering
@@ -118,6 +123,9 @@ plot(hierClust, xlab = "", title ="Cluster Dendrogram")
 method<- c("complete", "average", "centroid")
 
 # PCA
+
+
+
 
   
 ```

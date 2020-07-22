@@ -127,11 +127,56 @@ ui <- fluidPage(
                           )
                         )
                ),
-               tabPanel("Modeling", fluid = TRUE, icon = icon("list-alt")
+               tabPanel("Modeling", fluid = TRUE, icon = icon("list-alt"),
+                        titlePanel("Fitting linear model"),
+                        fluidRow(
+                                plotOutput("mplot2"),
+                          column(6,
+                                 selectizeInput("selectModel","Select Regression Model",
+                                                choices=c("Logistic Regression", "Linear Regression"),
+                                                selected ="Linear Regression"),
+                                 conditionalPanel(
+                                   condition = "input.selectModel == 'Linear Regression'",
+                                   selectizeInput("pHand", "Pitcher Handedness", choices = c("Left-Handed"="L", "Right-Handed"="R"),selected ="R")
+                                 ),
+                                 conditionalPanel(
+                                   condition = "input.selectModel == 'Logistic Regression'",
+                                   selectizeInput("bHand", "Batter Handedness", choices = c("Left-Handed"="L", "Right-Handed"="R"),selected ="R")
+                                 ),
+                                 sliderInput("releaseVelocity", "Pitch velocity (mph)", 
+                                             min = 60, max = 110, value = 88, step = 5),
+                                 sliderInput("locationHoriz", "Horizontal distance from plate center (feet)", 
+                                             min = 0, max = 5, value = 2.5, step = 0.5),
+                                 sliderInput("locationVert", "Vertical distance from plate center (feet)", 
+                                             min = -20, max = 20, value = 0, step = 5)
+                                 
+                                 ),
+                          column(6,
+                                 h4("Model coefficients: "),
+                                 # br(),
+                                 # tableOutput("coefs"),
+                                 # br(),
+                                 # br(),
+                                 # h4("The prediction is : "),
+                                 # br(),
+                                 # #Output the predict result
+                                 # textOutput("predictresult")
+                                 )
+                        )
 
-                            
                ),
-               tabPanel("Data Exporting", fluid = TRUE,icon = icon("table")
+               tabPanel("Data Exporting", fluid = TRUE,icon = icon("table"),
+                        fluidRow(
+                          column(3, 
+                                 h3("Download dataset here"),
+                                 downloadButton("export", "Download Data Set")
+                                 ),
+                          column(9,
+                                 # box(title = "Dataset", status = "primary", 
+                                 #     div(style = 'overflow-x: scroll', DT::dataTableOutput('exportData')))
+                                 DT::dataTableOutput('exportData')
+                                 )
+                        )
                             
                )
                         
