@@ -107,7 +107,7 @@ ggplot(plotData, aes(x = releaseVelocity, fill = batterHand)) +
 
 logi <- glm(FF_Type ~ releaseVelocity +  locationHoriz + locationVert   , family="binomial", data=modelData)
 
-linear <- lm(battedBallDistance ~ releaseVelocity +  + locationHoriz + locationVert   , data = modelData)
+linear <- lm(battedBallDistance ~ releaseVelocity + locationHoriz + locationVert   , data = modelData)
 
 summary(logi)
 summary(linear)

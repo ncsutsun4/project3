@@ -27,8 +27,10 @@ InPlay <- mondayBaseball %>% filter(pitchResult == "IP") %>%
 # pitch Velocity by pitch Type
 # breakingballs <- c("CU","KC","SC","SL")
 # changeups <- c("CH","KN","EP")
-# fastballs <- c("FC","FF","FS","FT","SI")
+ fastballs <- c("FC","FF","FS","FT","SI")
 
+sideLabs <- c("Top Inning", "Bottom Inning")
+names(sideLabs) <- c("T", "B")
 
 
 # Define server logic required to draw a histogram
@@ -125,25 +127,65 @@ shinyServer(function(input, output, session) {
     })
     
     # Fit models and predict navbarPage -3
-    
+    output$titleModel <- renderText({
+        paste0("Fitting ", input$selectModel, " model")
+    })
     
     mData <- reactive({
-        mData <- InPlay %>%  select(pitchType, releaseVelocity, pitcherHand, batterHand, battedBallDistance) %>% 
-            filter(pitchType == "FF")
+        mData <- InPlay %>%  select(pitchType, releaseVelocity, locationHoriz, locationVert,
+                                    pitcherHand, batterHand, battedBallDistance, side) %>% 
+            filter(pitcherHand == input$pHand & batterHand == input$bHand)%>% 
+            mutate(FF_Type = ifelse(pitchType %in% fastballs, 1, 0))
     })
-        
     
+    # output plot-3
     output$mplot2 <- renderPlot({
-        ggplot(mData(), aes(x = releaseVelocity, fill = batterHand)) +
-            geom_histogram(binwidth = 1, color = "grey30") +
-            facet_grid(~ pitcherHand) +
+        ggplot(mData(), aes(x = releaseVelocity)) +
+            geom_histogram(binwidth = 1, color = "red") +
+            facet_grid(~ side, labeller=labeller(side=sideLabs)) +
             xlim(60,105) +
             ylab("Frequency") +
             xlab("Pitch Speed (mph)") +
-            ggtitle("Pitch Velocity by Pitch Type") +
+            ggtitle("Pitch Velocity by Top or Bottom Inning") +
             theme(panel.grid.minor = element_blank(),
                   axis.ticks = element_blank())
     })
+    
+    # output model coefs
+    output$coefs <- renderTable({
+        modelData <- mData()
+        
+        if(input$selectModel == "Linear Regression"){
+            model <- lm(battedBallDistance ~ releaseVelocity + locationHoriz + locationVert, data = modelData)
+        }else if(input$selectModel == "Logistic Regression"){
+            model <- glm(FF_Type ~ releaseVelocity +  locationHoriz + locationVert, family="binomial", data=modelData)
+        }
+        print(model$coefficients)
+        coefs <- as.data.frame(as.list(model$coefficients))
+    })
+    
+    output$preds <- renderText({
+        
+        print(input$releaseVelocity);print(input$locationHoriz);print(input$locationVert)
+        
+        modelData <- mData()
+        if(input$selectModel == "Linear Regression"){
+            model <- lm(battedBallDistance ~ releaseVelocity + locationHoriz + locationVert   , data = modelData)
+            preds <- predict(model, newdata = data.frame(releaseVelocity=input$releaseVelocity,
+                                                locationHoriz = input$locationHoriz,
+                                                locationVert = input$locationVert))
+            text <- paste0("The predicted batted ball distance is: " , round(preds, 2), " feet.")
+        }else if(input$selectModel == "Logistic Regression"){
+            model <- glm(FF_Type ~ releaseVelocity +  locationHoriz + locationVert   , family="binomial", data=modelData)
+            preds <-predict(model, newdata = data.frame(releaseVelocity=input$releaseVelocity,
+                                                locationHoriz = input$locationHoriz,
+                                                locationVert = input$locationVert), type="response")
+            text <- paste0("The predicted type of the pitch is ", ifelse(preds > 0.5, "'Four-seam fastball'", "'Not a four-seam fastball'"), ".")
+        }
+        text
+
+    })
+
     
     # Exporting dataset navbarPage -4
     exportData <- reactive({

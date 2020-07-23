@@ -128,13 +128,14 @@ ui <- fluidPage(
                         )
                ),
                tabPanel("Modeling", fluid = TRUE, icon = icon("list-alt"),
-                        titlePanel("Fitting linear model"),
+                        titlePanel(textOutput("titleModel")), 
                         fluidRow(
                                 plotOutput("mplot2"),
                           column(6,
                                  selectizeInput("selectModel","Select Regression Model",
                                                 choices=c("Logistic Regression", "Linear Regression"),
                                                 selected ="Linear Regression"),
+                                 br(), br(), br(),
                                  conditionalPanel(
                                    condition = "input.selectModel == 'Linear Regression'",
                                    selectizeInput("pHand", "Pitcher Handedness", choices = c("Left-Handed"="L", "Right-Handed"="R"),selected ="R")
@@ -153,14 +154,14 @@ ui <- fluidPage(
                                  ),
                           column(6,
                                  h4("Model coefficients: "),
-                                 # br(),
-                                 # tableOutput("coefs"),
-                                 # br(),
-                                 # br(),
-                                 # h4("The prediction is : "),
-                                 # br(),
-                                 # #Output the predict result
-                                 # textOutput("predictresult")
+                                 br(),
+                                 tableOutput("coefs"),
+                                 br(),
+                                 br(),
+                                 h4("The prediction is : "),
+                                 br(),
+                                 #Output the predict result
+                                 h4(textOutput("preds"))
                                  )
                         )
 
