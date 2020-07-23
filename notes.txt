@@ -11,3 +11,5 @@ ggplot(data = InPlay, aes(x = battedBallDistance)) +
 
 Trace type must be one of the following: 
 'scatter', 'bar', 'box', 'heatmap', 'histogram', 'histogram2d', 'histogram2dcontour', 'contour', 'scatterternary', 'violin', 'funnel', 'waterfall', 'image', 'pie', 'sunburst', 'treemap', 'funnelarea', 'scatter3d', 'surface', 'isosurface', 'volume', 'mesh3d', 'cone', 'streamtube', 'scattergeo', 'choropleth', 'scattergl', 'splom', 'pointcloud', 'heatmapgl', 'parcoords', 'parcats', 'scattermapbox', 'choroplethmapbox', 'densitymapbox', 'sankey', 'indicator', 'table', 'carpet', 'scattercarpet', 'contourcarpet', 'ohlc', 'candlestick', 'scatterpolar', 'scatterpolargl', 'barpolar', 'area'
+
+"releaseVelocity", "locationHoriz", "locationVert", "movementHoriz", "movementVert", "battedBallAngle","battedBallDistance"

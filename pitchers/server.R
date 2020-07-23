@@ -15,11 +15,11 @@ if(!exists("mondayBaseball")) {
     load(url("http://stat.duke.edu/courses/Summer17/sta101.001-2/uploads/project/mondayBaseball.Rdata"))
 }
 
-# Subset new data set with only pitches hit in play and remove some unrelated varables
+# Subset new data set with only pitches hit in play and remove some unrelated variables and columns with "NA"
 InPlay <- mondayBaseball %>% filter(pitchResult == "IP") %>% 
     select(-c(gameString, gameDate, batterId, batterName, batterPosition, timesFaced,
               catcher, umpireId, umpire)) %>% select_if(~ !any(is.na(.)))
-
+# Note;
 # balls : # of balls thrown before that thrown
 # strikes : # of strickes batter obtained
 # outs  :  players been declared out
@@ -27,16 +27,19 @@ InPlay <- mondayBaseball %>% filter(pitchResult == "IP") %>%
 # pitch Velocity by pitch Type
 # breakingballs <- c("CU","KC","SC","SL")
 # changeups <- c("CH","KN","EP")
+
+# divide pitch type to fastball and slowballs
  fastballs <- c("FC","FF","FS","FT","SI")
 
+# Create vector for plot labels
 sideLabs <- c("Top Inning", "Bottom Inning")
 names(sideLabs) <- c("T", "B")
 
 
-# Define server logic required to draw a histogram
+# Shiny server
 shinyServer(function(input, output, session) {
     
-    # For 2st navbarPage - EDA
+    # For 2nd navbarPage - EDA
     # Get updated data set
     plotData <- reactive({
         print(input$pitchType) ; print(input$side);
@@ -45,32 +48,64 @@ shinyServer(function(input, output, session) {
        plotData
     })
     
+    # histogram output
     output$hist <- renderPlotly({
         data <- plotData()
         plot_ly(data, x= ~battedBallDistance, type="histogram") %>% 
-            layout(title = "Distribution of Batted Ball Distance", 
+            layout(title = "Histogram Plot", 
                    xaxis = list(title = "Distance From Home Plate"), 
                    yaxis = list(title = "Count"))
     })
     
     # output data
-    output$table <- renderTable({
-        table <- plotData() %>% arrange(battedBallDistance)
-        head(table)
+    output$table <- DT::renderDataTable({
+        
+        DT::datatable({
+            plotData()},
+            extensions = 'Buttons',
+            
+            options = list(
+                paging = TRUE,
+                searching = TRUE,
+                fixedColumns = TRUE,
+                autoWidth = TRUE,
+                ordering = TRUE,
+                dom = 'tB',
+                buttons = c('copy', 'csv', 'excel')
+            ),
+            
+            class = "display"
+            
+        )
     })
     
+    # output scatter plot
+    output$scatter <- renderPlotly({
+        scatData <- plotData()
+        
+        # x0 <- scatData[input$first]
+        # y0 <- scatData[input$second]
+        
+        plot<- plot_ly(scatData, x= ~get(input$first), y= ~get(input$second), color= ~pitcherHand, 
+                       type="scatter") %>% 
+            layout(title = "Scatter Plot")
+        plot
+    })
+    
+    # output download data option
     output$download1 <- downloadHandler(
         filename = function(){paste(input$pitchType, "_", input$side, ".csv")},
         content = function(file){write.csv(plotData(), file, row.names = FALSE)}
     )
     
-    # Title
+    # Title labels
     output$subt1 <- renderUI({paste0("Histogram")})
     output$subt2 <- renderUI({paste0("Table")})
+    output$subt21 <- renderUI({paste0("Scatter plot")})
+    
     
     
     # For 3rd navbarPage - PCA Analysis
-    
     
     # Select ball related numeric data;
     pcaData <- reactive({
@@ -84,7 +119,9 @@ shinyServer(function(input, output, session) {
 
      # pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
      # screPlot <- screeplot(pcaAnalysis, type="lines")
-
+    
+    
+    # ouput screeplot
     output$screePlot <- renderPlot({
         pcaData <- pcaData()
         pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
@@ -111,15 +148,18 @@ shinyServer(function(input, output, session) {
          pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
          pcaAnalysis$rotation
      })
-    
+        
+     # download output
      output$download2 <- downloadHandler(
          filename = function(){paste(input$pitcherHand, "-Handed.csv")},
          content = function(file){write.csv(pcaData(), file, row.names = FALSE)}
     )
      
+     # tab labels
      output$subt3 <- renderUI({paste0(input$ptid2, " proportion of variable explained")})
      output$subt4 <- renderUI({paste0(input$ptid2, " Bioplot")})
 
+     # ouput biplot
     output$biPlot <- renderPlot({
         pcaData <- pcaData()
         pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
@@ -131,6 +171,7 @@ shinyServer(function(input, output, session) {
         paste0("Fitting ", input$selectModel, " model")
     })
     
+    # update dataset
     mData <- reactive({
         mData <- InPlay %>%  select(pitchType, releaseVelocity, locationHoriz, locationVert,
                                     pitcherHand, batterHand, battedBallDistance, side) %>% 
@@ -164,6 +205,7 @@ shinyServer(function(input, output, session) {
         coefs <- as.data.frame(as.list(model$coefficients))
     })
     
+    # output predictions
     output$preds <- renderText({
         
         print(input$releaseVelocity);print(input$locationHoriz);print(input$locationVert)
@@ -180,13 +222,12 @@ shinyServer(function(input, output, session) {
             preds <-predict(model, newdata = data.frame(releaseVelocity=input$releaseVelocity,
                                                 locationHoriz = input$locationHoriz,
                                                 locationVert = input$locationVert), type="response")
-            text <- paste0("The predicted type of the pitch is ", ifelse(preds > 0.5, "'Four-seam fastball'", "'Not a four-seam fastball'"), ".")
+            text <- paste0("The predicted type of the pitch is ", ifelse(preds > 0.5, "'Fastball'", "'Not fastball'"), ".")
         }
         text
 
     })
 
-    
     # Exporting dataset navbarPage -4
     exportData <- reactive({
         exportData <- InPlay 
@@ -214,7 +255,7 @@ shinyServer(function(input, output, session) {
             )
 
     })
-    #For download
+    #For download options
     output$export <- downloadHandler(
         filename = function(){paste("Pitcher data.csv")},
         content = function(file){write.csv(exportData(), file, row.names = FALSE)}
