@@ -32,6 +32,8 @@ runGitHub('pitchRx', 'cpsievert',
 ```{r}
 library(shiny)
 shiny::runGitHub('shiny_apps', 'cpsievert', subdir='pitchRx')
+
+shiny::runGitHub('project3', 'ncsutsun4', subdir='pitchers')
 ```
 
 
