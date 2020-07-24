@@ -10,17 +10,17 @@ library(DT)
 library(shinythemes)
 
 # Define UI
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("cerulean"),
+    titlePanel("Exploring PITCHf/x"),
     #Navbar structure for UI
-    navbarPage("Patcher Data", theme = shinytheme("journal"), # theme = lumen
+    navbarPage("Let's get started", # theme = lumen
                # First Navbar - information section;
-               tabPanel("Information", fluid = TRUE, icon = icon("globe-americas"),
+               tabPanel(icon("home"), #"Information", fluid = TRUE, icon = icon("globe-americas"),
                         fluidRow(
                             withMathJax(), # Include mathjax
                             # Data introduction
-                            column(6,
+                            column(width=6,
                                    h1(p("Data Introduction")),
-                                   box(background = "red", width=12,
                                    h4(p("PITCHf/x is a system developed by Sportvision and introduced in Major League Baseball (MLB) 
                                         during the 2006 playoffs.  It uses two cameras to record the position of the pitched baseball
                                         during its flight from the pitcher’s hand to home plate, and various parameters are measured 
@@ -34,7 +34,7 @@ ui <- fluidPage(
                                       p("$$ z(t) = z_0 + vz_0 * t + az * t^2 $$"),
                                       p("The fitted coefficients are saved as: $$x_0, y_0, z_0, vx_0, vy_0, vz_0, ax, ay, az.$$ "),
                                       p(a("More introduction can be see here", href="https://pitchrx.cpsievert.me/"))
-                                   ))
+                                   )
 
                             ),
                             # APP introduction
