@@ -86,11 +86,19 @@ shinyServer(function(input, output, session) {
         # x0 <- scatData[input$first]
         # y0 <- scatData[input$second]
         
-        plot<- plot_ly(scatData, x= ~get(input$first), y= ~get(input$second), color= ~pitcherHand, 
-                       type="scatter") %>% 
-            layout(title = "Scatter Plot")
-        plot
+        plot<- plot_ly(scatData, x= ~get(input$first), y= ~get(input$second), #color= ~pitcherHand, 
+                       type="scatter", mode="markers") %>% 
+            layout(title = "Scatter Plot", xaxis=list(title=input$first), yaxis=list(title=input$second))
     })
+    
+    # output cor
+    output$correlacion1 <- renderText({
+        corr <- cor(plotData()[input$first], plotData()[input$second])
+        paste("Correlation = ", corr)
+    })
+    
+    
+    
     
     # output download data option
     output$download1 <- downloadHandler(
@@ -182,14 +190,20 @@ shinyServer(function(input, output, session) {
     # output plot-3
     output$mplot2 <- renderPlot({
         ggplot(mData(), aes(x = releaseVelocity)) +
-            geom_histogram(binwidth = 1, color = "red") +
+            geom_histogram(bins=nclass.Sturges(as.double(mData()$releaseVelocity)),
+                binwidth = 1, color = "white", fill="seagreen1", aes(y=..density..), lwd=0.8) +
+            geom_density(color="seagreen4", alpha=0.3,fill="seagreen4",lty=1) +
             facet_grid(~ side, labeller=labeller(side=sideLabs)) +
             xlim(60,105) +
             ylab("Frequency") +
             xlab("Pitch Speed (mph)") +
             ggtitle("Pitch Velocity by Top or Bottom Inning") +
-            theme(panel.grid.minor = element_blank(),
-                  axis.ticks = element_blank())
+            
+            theme(plot.title = element_text(color="navy", size=15, face="bold.italic",hjust=0.5),
+                  axis.title.x = element_text(color="navy", size=13, face="bold"),
+                  axis.title.y = element_text(color="navy", size=13, face="bold"))
+            # theme(panel.grid.minor = element_blank(),
+            #       axis.ticks = element_blank())
     })
     
     # output model coefs

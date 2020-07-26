@@ -34,7 +34,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                       
                                       p("The PITCHf/x collected parameter about each pitch, and a best fitting curve is fit to the following equations of motion.",
                                       "$$ x(t) = x_0 + vX_0 * t + ax * t^2 $$","$$ y(t) = y_0 + vy_0 * t + ay * t^2 $$", "$$z(t) = z_0 + vz_0 * t + az * t^2$$",
-                                      "The fitted coefficients are saved as: $$x_0, y_0, z_0, vx_0, vy_0, vz_0, ax, ay, az.$$ ",
+                                      "The fitted coefficients are saved as: $$x_0,~ y_0, ~z_0, ~vx_0, ~vy_0, ~vz_0, ~ax, ~ay, ~az.$$ ",
                                       a("More introduction can be see here", href="https://pitchrx.cpsievert.me/"))
                                    )
 
@@ -64,11 +64,20 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                ),  
                # second Navbar - Data exploration section;
                tabPanel("Data Exploration", fluid = TRUE,icon = icon("bar-chart-o"),
-                        titlePanel("Pitch distance by pitch type"),
+                        #titlePanel(p("Pitch distance by pitch type", style="color:black;text-align:center")),
+                        fluidRow(column(width=3),
+                                 column(width=9, tags$style(".fa-chart-pie {color:#E87722}"),
+                                        h3(p(em("Graphical tests "),icon("chart-pie",lib = "font-awesome"),style="color:black;text-align:center")))),
+                        
                         fluidRow(
                             # selection panel
                             column(3,
+                                   
+                                   helpText(h3("Download data here")),
+                                   downloadButton("download1", "Download Data Set"),
+                                   
                                    helpText(h3("Viewing the baseball distance by selecting different pitch type")),
+                                   #p("Viewing the baseball distance by selecting different pitch type",style="color:black;text-align:center"),
                                    selectizeInput(inputId = "pitchType",
                                                   label = "Pitch Type",
                                                   choices = c("Four-seamfastball"="FF",
@@ -86,13 +95,13 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                                               "Screwball"="SC"),
                                                   selected ="FF"
                                    ),
+                                   
+                                   
+                                   
                                    selectInput(inputId = "side",
                                                label = "Top or Botton Innings",
                                                choices = c("Top" = "T", "Bottom" = "B"),
                                                selected = "T"),
-                                   
-                                   helpText(h3("Select school and event to create plots")),
-                                   downloadButton("download1", "Download Data Set"),
                                    
                                    
                                    br(), br(), br(),
@@ -108,20 +117,45 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                             # output panel
                             column(9,
                                    tabsetPanel(
-                                   tabPanel(uiOutput("subt1"),
-                                               fluidRow(
-                                                 column(12, plotlyOutput("hist")))),
-                                   tabPanel(uiOutput("subt2"),
-                                               fluidRow(
-                                                 column(12, DT::dataTableOutput('table')))), 
+
                                    tabPanel(uiOutput("subt21"),
                                                fluidRow(
-                                                 column(12, plotlyOutput("scatter"))))
+                                                 p("Now let's try to study the relationships between the numeric variables. For this we are going to make it simple, for the modeling process we are working on 
+                                                   we need linear relationships. So, let's work with correlation coefficients and scatter 
+                                                   plots.",style="color:black;text-align:justify"),
+                                                 br(),
+                                                 p('\\( ~~~~~~~~~~~~~~~~~~~~~cor = \\frac{\\sum_{i=1}^n (x_i-\\bar x)(y_i - \\bar y)}{\\sqrt{\\sum_{i=1}^n (x_i-\\bar x)^2 \\sum_{i=1}^n (y_i - \\bar y)^2}} \\)',style="color:black; font-size: 130%"),
+                                                 p("Read more about correlation coefficient here  --> ",a(href="https://en.wikipedia.org/wiki/Correlation_coefficient", icon("wikipedia-w"),target="_blank"),style="color:black; text-align:center"),
+                                                 
+                                                 column(width = 12,#style="background-color:papayawhip;border-left:8px solid coral;border-top:1px solid black;border-bottom:1px solid black;border-right: 1px solid black",
+                                                        plotlyOutput("scatter"),
+                                                        br(), br(),
+                                                    
+                                                        tags$head(tags$style("#correlacion1{color: black;
+                                                                        font-size: 15px;
+                                                                        text-align: center;
+                                                                        }")),
+                                                        
+                                                        textOutput("correlacion1"),
+                                                        br(),
+                                                        p("This coefficient is a measure of the strength and direction of the linear relationship, so we want to achieve a coefficient closer to |1|",style="color:black;text-align:justify;background-color:papayawhip;border-left:1px solid coral;border-top:1px solid black;border-bottom:1px solid black;border-right: 1px solid black"),
+                                                        
+                                                        
+                                                        ))),
+                                                 
+                                   
+                                   tabPanel(uiOutput("subt1"),
+                                            fluidRow(
+                                              column(12, plotlyOutput("hist")))),
+                                   
+                                   tabPanel(uiOutput("subt2"),
+                                            fluidRow(
+                                              column(12, DT::dataTableOutput('table'))))
                                      )
                                    )
                                 )
                ),
-               # Third Navbar - DPCA section;
+               # Third Navbar - PCA section;
                tabPanel("PCA Analysis", fluid = TRUE,icon = icon("refresh"),
                         titlePanel("PCA analysis"),
                         fluidRow(
@@ -190,7 +224,16 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                  
                                  ),
                           # prediction output panel
-                          column(6,
+                          column(width = 6,style="background-color:lavender;border-left:8px solid blue",
+                                 
+                                 tags$head(tags$style("#preds{color: navy;
+                                                             font-size: 15px;
+                                                             font-style: italic;
+                                                             font-weight: bold;
+                                                             text-align: center
+                                                             }")),
+                                 
+                                 
                                  h4("Model coefficients: "),
                                  br(),
                                  tableOutput("coefs"),
