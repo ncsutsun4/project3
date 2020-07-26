@@ -19,28 +19,33 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                         fluidRow(
                             withMathJax(), # Include mathjax
                             # Data introduction
-                            column(width=6,
+                            column(width=6, style="text-align:justify;color:black;background-color:lavender;padding:15px;border-radius:10px",
                                    h1(p("Data Introduction")),
-                                   h4(p("PITCHf/x is a system developed by Sportvision and introduced in Major League Baseball (MLB) 
+                                   br(),
+                                   h4(
+                                      p(strong("PITCHf/x"), "is a system developed by Sportvision and introduced in Major League Baseball (MLB) 
                                         during the 2006 playoffs.  It uses two cameras to record the position of the pitched baseball
                                         during its flight from the pitcher’s hand to home plate, and various parameters are measured 
                                         and calculated to describe the trajectory and speed of each pitch. It is now instituted in all ballparks in MLB."),
+                                      
                                       p("Great amount of data was collected with PITCHf/x system. The data set in this project is comprised of 
                                         all pitches thrown on Mondays during the 2016 MLB regular season, excluding intentional walks. ",
                                         a("Here is the link", href="https://www2.stat.duke.edu/courses/Summer17/sta101.001-2/uploads/project/project.html")),
-                                      p("The PITCHf/x collected parameter about each pitch, and a best fitting curve is fit to the following equations of motion."),
-                                      p("$$ x(t) = x_0 + vX_0 * t + ax * t^2 $$"),
-                                      p("$$ y(t) = y_0 + vy_0 * t + ay * t^2 $$"),
-                                      p("$$ z(t) = z_0 + vz_0 * t + az * t^2 $$"),
-                                      p("The fitted coefficients are saved as: $$x_0, y_0, z_0, vx_0, vy_0, vz_0, ax, ay, az.$$ "),
-                                      p(a("More introduction can be see here", href="https://pitchrx.cpsievert.me/"))
+                                      
+                                      p("The PITCHf/x collected parameter about each pitch, and a best fitting curve is fit to the following equations of motion.",
+                                      "$$ x(t) = x_0 + vX_0 * t + ax * t^2 $$","$$ y(t) = y_0 + vy_0 * t + ay * t^2 $$", "$$z(t) = z_0 + vz_0 * t + az * t^2$$",
+                                      "The fitted coefficients are saved as: $$x_0, y_0, z_0, vx_0, vy_0, vz_0, ax, ay, az.$$ ",
+                                      a("More introduction can be see here", href="https://pitchrx.cpsievert.me/"))
                                    )
 
                             ),
+                           
+                            
                             # APP introduction
-                            column(6,
+                            column(width=6, style="text-align:justify;color:black;background-color:papayawhip;padding:15px;border-radius:10px",
                                    h1(p("App introduction")),
-                                   box(background="red", width=12,
+                                   br(),
+                                   
                                    h4(p("This App is to exploring the data and developing some interactive models "),
                                       p(strong("Data Exploration"), ": The first tab is to see the distribution
                                         of the distance by different pitch types. The second tab is to show the original data. The third tab is to 
@@ -51,9 +56,10 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                       p(strong("Modeling"), ": Fit the data using two model: linear regression and logistic regression. You may select variable's values to 
                                         make predictions"),
                                       p(strong("Data Exporting"), ": To view and download the data you interested. ")
-                                   ))
+                                   )
                             )
-                        )
+                        ),
+                        p(em("Developed by"),br("Tao Sun"),style="text-align:center; font-family: times")
                         
                ),  
                # second Navbar - Data exploration section;
