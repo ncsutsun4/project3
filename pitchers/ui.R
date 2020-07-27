@@ -146,7 +146,8 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                    
                                    tabPanel(uiOutput("subt1"),
                                             fluidRow(
-                                              column(12, plotlyOutput("hist")))),
+                                              column(12, plotlyOutput("hist"))),
+                                            ),
                                    
                                    tabPanel(uiOutput("subt2"),
                                             fluidRow(
@@ -187,10 +188,15 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                                  tabsetPanel(
                                    tabPanel(uiOutput("subt3"),
                                             fluidRow(
-                                              column(12, plotOutput("screePlot")))),
+                                              column(12, plotOutput("screePlot"))),
+                                            downloadButton('downloadScreeplot', 'Download Plot')
+                                            
+                                            ),
                                    tabPanel(uiOutput("subt4"),
                                             fluidRow(
-                                              column(12, plotOutput("biPlot"))))
+                                              column(12, plotOutput("biPlot"))),
+                                            downloadButton('downloadBiplot', 'Download Plot')
+                                            )
                                  )
                           )
                         )
@@ -201,6 +207,7 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                         titlePanel(textOutput("titleModel")), 
                         fluidRow(
                                 plotOutput("mplot2"), # histogram plot
+                                downloadButton('downloadmplot2', 'Download Plot'),
                                 # selection panel
                           column(6,
                                  selectizeInput("selectModel","Select Regression Model",

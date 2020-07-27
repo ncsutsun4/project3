@@ -164,7 +164,7 @@ shinyServer(function(input, output, session) {
     )
      
      # tab labels
-     output$subt3 <- renderUI({paste0(input$ptid2, " proportion of variable explained")})
+     output$subt3 <- renderUI({paste0(input$ptid2, " Proportion of variation explained")})
      output$subt4 <- renderUI({paste0(input$ptid2, " Bioplot")})
 
      # ouput biplot
@@ -173,6 +173,32 @@ shinyServer(function(input, output, session) {
         pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
         biplot(pcaAnalysis,xlabs = rep(".", nrow(pcaData)), cex = 1.2, choices=c(input$selectPc1, input$selectPc2))
     })
+    
+
+    # download biplot
+    output$downloadBiplot <- downloadHandler(
+        filename = function() { paste('biplot.png') },
+        content = function(file) {
+            png(file)
+            pcaData <- pcaData()
+            pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
+            biplot(pcaAnalysis,xlabs = rep(".", nrow(pcaData)), cex = 1.2, choices=c(input$selectPc1, input$selectPc2))
+            dev.off()
+        }
+    )
+    
+    # download screeplot
+    output$downloadScreeplot <- downloadHandler(
+        filename = function() { paste('Screeplot.png') },
+        content = function(file) {
+            png(file)
+            pcaData <- pcaData()
+            pcaAnalysis <- prcomp(pcaData, center = TRUE, scale = TRUE)
+            screPlot <- screeplot(pcaAnalysis, type="lines")
+            dev.off()
+        }
+    )
+    
     
     # Fit models and predict navbarPage -3
     output$titleModel <- renderText({
@@ -205,6 +231,28 @@ shinyServer(function(input, output, session) {
             # theme(panel.grid.minor = element_blank(),
             #       axis.ticks = element_blank())
     })
+    
+    # output plot
+    output$downloadmplot2 <- downloadHandler(
+        filename = function() { paste('histogram2.png') },
+        content = function(file) {
+            png(file)
+            ggplot(mData(), aes(x = releaseVelocity)) +
+                geom_histogram(bins=nclass.Sturges(as.double(mData()$releaseVelocity)),
+                               binwidth = 1, color = "white", fill="seagreen1", aes(y=..density..), lwd=0.8) +
+                geom_density(color="seagreen4", alpha=0.3,fill="seagreen4",lty=1) +
+                facet_grid(~ side, labeller=labeller(side=sideLabs)) +
+                xlim(60,105) +
+                ylab("Frequency") +
+                xlab("Pitch Speed (mph)") +
+                ggtitle("Pitch Velocity by Top or Bottom Inning") +
+                
+                theme(plot.title = element_text(color="navy", size=15, face="bold.italic",hjust=0.5),
+                      axis.title.x = element_text(color="navy", size=13, face="bold"),
+                      axis.title.y = element_text(color="navy", size=13, face="bold"))
+            dev.off()
+        }
+    )
     
     # output model coefs
     output$coefs <- renderTable({
